@@ -1,0 +1,11 @@
+./Gemfile
+./LICENSE
+./include_files.txt
+./.github/workflows/pages.yml
+./_config.yml
+./.gitignore
+./_config.public.yml
+./CNAME
+./index.public.md
+./README.public.md
+./README.md

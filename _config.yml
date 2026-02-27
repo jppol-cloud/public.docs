@@ -1,0 +1,48 @@
+title: JPPOL Cloud
+description: Public documentation for jppol-cloud
+theme: just-the-docs
+remote_theme: just-the-docs/just-the-docs
+
+url: https://docs.cloud.jppol.dk
+
+aux_links:
+  # Links to the private repo where changes should be made
+  GitHub: https://github.com/jppol-cloud/private.docs
+
+mermaid:
+  version: "9.1.3"
+
+plugins:
+  - jekyll-default-layout
+
+# Enable search
+search_enabled: true
+search:
+  heading_level: 2
+  previews: 3
+  preview_words_before: 5
+  preview_words_after: 10
+  tokenizer_separator: /[\s/]+/
+  rel_url: true
+  button: false
+
+# Footer content
+footer_content: "Copyright &copy; 2024-2026 JPPOL."
+
+# Heading anchor links
+heading_anchors: true
+
+# Navigation
+nav_sort: case_insensitive
+
+# Callouts
+callouts:
+  warning:
+    title: Warning
+    color: yellow
+  note:
+    title: Note
+    color: blue
+  important:
+    title: Important
+    color: red
