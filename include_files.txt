@@ -4,6 +4,9 @@
 ./.github/workflows/pages.yml
 ./_config.yml
 ./.gitignore
+./content/manifest.gpt
+./content/manifest.existing
+./content/slack
 ./_config.public.yml
 ./CNAME
 ./index.public.md
