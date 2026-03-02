@@ -1,0 +1,25 @@
+name: Lint GitHub Actions workflows
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**'
+  push:
+    branches: ['main']
+    paths:
+      - '.github/workflows/**'
+
+permissions:
+  contents: read
+
+jobs:
+  actionlint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Run actionlint
+        uses: raven-actions/actionlint@ab8e7e7e344b5f6d50b42a43f6457500a2809f11 # v1.0.5
+        with:
+          fail-on-error: true
