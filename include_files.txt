@@ -1,7 +1,6 @@
 ./Gemfile
 ./.pre-commit-config.yaml
 ./LICENSE
-./=
 ./include_files.txt
 ./.github/workflows/pages.yml
 ./.github/workflows/actionlint.yml
