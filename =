@@ -1,0 +1,148 @@
+---
+title: "[Etablere platform-baseline]"
+nav_order: 99
+domain: private
+permalink: /platform-baseline/[initiativ-slug]
+status: draft # draft | in-progress | done
+phase: fundament # fundament | standardisering | skalering
+---
+
+# [Initiativ navn]
+
+> Etablere platform-baseline der relaterer til emner af politisk, teknisk, og omkostning
+
+---
+
+## Formål
+
+Beskriv overordnede opgaver der relaterer til cloud platformen
+
+- aws ireland evacuation
+- aws eu soverign cloud
+- discovery and test of alternative hyperscalers
+- aws eks-anywhere
+
+
+
+
+Beskriv opgaver der relaterer til etablering af konto baseline i AWS
+
+- SAML integration, conditional access
+- AD group auditing vs terraform administration
+- cloudtrail auditing across terraform and github actions
+-
+
+
+Beskriv fokus der relaterer til FinOps optimeringer (USD/year ex tax)
+
+- enteprise discount program
+- service fokus:
+
+| Service | Service total |
+|---|---|
+| Tax | 423.383 |
+| Savings Plans for Compute usage | 210.813 |
+| Relational Database Service | 165.105 |
+| EC2-Other | 161.004 |
+| CloudFront | 150.499 |  <-- Focus
+| S3 | 131.078 |  <-- Focus
+| EC2-Instances | 118.582 |
+| CloudWatch | 115.147 |  <-- Focus
+| Redshift | 100.394 |  <-- Focus
+| Trend Enterprise Security Solutions | 80.900 |
+| VPC | 64.631 |
+| Elastic Load Balancing | 41.408 |
+| Managed Streaming for Apache Kafka | 40.202 |
+| Elastic Container Service | 35.861 |
+| Kinesis | 32.622 |
+| Support (Business) | 32.106 |  <-- Focus
+| Config | 29.940 |  <-- Focus
+| Managed Service for Prometheus | 25.935 |  <-- Focus
+| Lambda | 21.801 |
+| Elastic Container Service for Kubernetes | 18.900 |
+| Apache Kafka® & Apache Flink® on Confluent Cloud™ - Pay As You Go | 17.366 |
+| ElastiCache | 15.232 |
+| Elastic File System | 14.749 |
+| Transfer Family | 14.627 |
+| Elastic MapReduce | 13.183 |
+| Glue | 12.564 |
+| Managed Workflows for Apache Airflow | 11.801 |
+| Route 53 | 10.887 |
+| Inspector | 10.044 |  <-- Focus
+| DynamoDB | 9.543 |
+| EC2 Container Registry (ECR) | 9.484 |
+| Secrets Manager | 8.304 |
+| Kinesis Firehose | 8.005 |  <-- Focus
+| API Gateway | 6.782 |
+| OpenSearch Service | 6.105 |
+| WAF | 6.035 |
+| SQS | 5.809 |
+| OCBLateFee | 4.645 |
+| Support (Developer) | 4.645 |
+| CloudTrail | 4.343 |
+| MongoDB Atlas (pay-as-you-go) | 4.284 |
+| Athena | 4.135 |
+| MongoDB Atlas on - Contract with Usage | 2.463 |
+| Savings Plans for Database Usage | 2.142 |
+| Managed Grafana | 1.884 |
+| CloudSearch | 1.829 |
+| Clean Rooms | 1.811 |
+| Network Firewall | 1.595 |
+| MemoryDB | 1.559 |
+| Elastic Transcoder | 1.335 |
+| Key Management Service | 1.321 |
+| Firewall Manager | 1.200 |
+| Kinesis Analytics | 1.017 |
+| X-Ray | 997 |
+| Security Hub | 933 |
+| Global Accelerator | 721 |
+| QuickSight | 614 |
+| CodeArtifact | 584 |
+| Registrar | 565 |
+| SNS | 482 |
+| Cost Explorer | 393 |
+| Directory Service | 331 |
+| GuardDuty | 317 |
+| Claude 3.5 Sonnet (Bedrock Edition) | 225 |
+| WorkSpaces | 213 |
+| CloudWatch Events | 170 |
+| Certificate Manager | 151 |
+| Elemental MediaConvert | 129 |
+| Systems Manager | 85 |
+| SES | 68 |
+| Fault Injection Simulator | 56 |
+| End User Messaging | 52 |
+| Claude Sonnet 4.6 (Bedrock Edition) | 25 |
+| Claude Sonnet 4.5 (Bedrock Edition) | 25 |
+| Claude Sonnet 4 (Bedrock Edition) | 19 |
+| Q | 19 |
+| MQ | 14 |
+| Backup | 13 |
+| Claude Haiku 4.5 (Bedrock Edition) | 10 |
+| Lightsail | 5 |
+| Payment Cryptography | 3 |
+| SageMaker | 2 |
+| Claude 3.7 Sonnet (Bedrock Edition) | 2 |
+| Bedrock | 1 |
+| CodePipeline | 1 |
+| Service Catalog | 1 |
+| CodeBuild | 1 |
+| Location Service | 1 |
+| Rekognition | 0 |
+| Elemental MediaStore | 0 |
+| Claude 3.5 Haiku (Bedrock Edition) | 0 |
+| Amplify | 0 |
+| Step Functions | 0 |
+| CloudShell | 0 |
+| Glacier | 0 |
+| SimpleDB | 0 |
+| Simple Workflow Service | 0 |
+| Lake Formation | 0 |
+| CloudFormation | 0 |
+| Cognito | 0 |
+| CloudFront Flat-Rate Plans | 0 |
+| DataZone | 0 |
+| CodeCommit | 0 |
+| Data Transfer | -1 |
+| Refund | -7.270 |
+| **Total costs** | **2.220.994** |
