@@ -10,14 +10,14 @@ Standarder og reference arkitektur, paved roads
 
 forventninger til drift (fx 24/7 eller ej)
 Platforme har 24/7 for det de selv ejer
-AMP: controlplane, altså konti, guardrails, identity integration, netværksfundament, logging/monitorering pipeline, baseline security services
+Cloud Platform: controlplane, altså konti, guardrails, identity integration, netværksfundament, logging/monitorering pipeline, baseline security services
 DevTeams: deres workloads, applikationsdrift, incidents i deres services
 Særlige platforme IDP/EP/DFP: deres platformprodukter (Kafka, data services, udviklerplatform)
 
 
 hvilket ansvarsniveau teamet har ift. aws-miljøet
 +----------------------------+-------------------------------+---------------------------+-------------------------------+
-| Domæne                     | AMP                           | IDP                       | Produktteams                  |
+| Domæne                     | Cloud Platform                           | IDP                       | Produktteams                  |
 +----------------------------+-------------------------------+---------------------------+-------------------------------+
 | AWS org / konti / guardrails| Ejer                          | Forbruger (via workflows) | Følger + efterlever           |
 | Landing zone / baseline     | Ejer                          | Forbruger                 | Bruger                        |
@@ -27,15 +27,15 @@ hvilket ansvarsniveau teamet har ift. aws-miljøet
 | Provisioning / self-service | Understøtter (API/guardrails) | Ejer                      | Forbruger                     |
 | CI/CD, templates, golden path| Input/krav + guardrails      | Ejer                      | Forbruger                     |
 | Workloads (apps, data)      | Standarder + rådgivning       | Golden paths              | Ejer + drift                  |
-| Incident: control plane     | Ejer (beredskab for AMP)      | Informeres                | Informeres                    |
+| Incident: control plane     | Ejer (beredskab for Cloud Platform)      | Informeres                | Informeres                    |
 | Incident: workloads/apps    | Understøtter / eskaleres      | Understøtter              | Ejer (beredskab for apps)     |
 | FinOps guardrails (tags, budgets)| Ejer                      | Forbruger                | Ejer forbrug + optimering     |
 | Compliance 2nd line (kontrol)| Ikke-ejer (input)             | Ikke-ejer                | Ikke-ejer                     |
 +----------------------------+-------------------------------+---------------------------+-------------------------------+
 hvad der fortsat ligger andre steder
-AMP ejer fundament og governance, altså control-plane. IDP ejer developer experience. Produktteams ejer applikationer og drift.
-AMP/Cloud Platform Team: Control plane + guardrails + baselines + enablement + integrationer
-IDP: Devex, selvbetjening, gyldne stier, pipelines, integrationer med AMP
+Cloud Platform ejer fundament og governance, altså control-plane. IDP ejer developer experience. Produktteams ejer applikationer og drift.
+Cloud Team: Control plane + guardrails + baselines + enablement + integrationer
+IDP: Devex, selvbetjening, gyldne stier, pipelines, integrationer med Cloud Platform
 Produktteams: Workloads + drift + Applikationsnær sikkerhed + dataejerskab og datakvalitet, budget (SLO, incidents, performance, deployments, secrets usage, config)
 Sikkerhedsteam: Policies, risikovurdering, auditkrav
 Netværksteams: on-prem/hybrid/vpn

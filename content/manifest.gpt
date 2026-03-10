@@ -1,37 +1,37 @@
 ---
 title: Manifest
-description: AWS Management Platform (AMP) – fælles cloud-fundament for koncernen
+description: Cloud Platform – fælles cloud-fundament for koncernen
 ---
 
-# Manifest: AWS Management Platform (AMP)
+# Manifest: Cloud Platform
 
 ## Hvorfor (kontekst)
 Cloud er fundamentet for vores digitale løsninger – og alt nyt bygges i cloud.  
 Samtidig er vores eksisterende cloud-landskab vokset decentralt og kræver fælles styring og oprydning.
 
-**AMP gør cloud til en fælles platform med governance, standarder og tydeligt mandat.**
+**Cloud Platform gør cloud til en fælles platform med governance, standarder og tydeligt mandat.**
 
 ---
 
-## Hvad AMP er
-AMP er koncernens fælles AWS cloud-fundament.  
+## Hvad Cloud Platform er
+Cloud Platform er koncernens fælles AWS cloud-fundament.  
 Platformen etablerer et sikkert, stabilt og skalerbart fundament, der gør det nemt at anvende AWS kontrolleret, omkostningseffektivt og konsistent på tværs af organisationen.  
-(AMP reducerer risiko, standardiserer adoption og accelererer levering via automatisering og fælles services.)
+(Cloud Platform reducerer risiko, standardiserer adoption og accelererer levering via automatisering og fælles services.)
 
 > AWS er en strategisk kapabilitet – ikke et individuelt initiativ.
 
 ---
 
-## Hvem AMP er for
-AMP anvendes af udviklings- og platformteams, der arbejder i AWS.
+## Hvem Cloud Platform er for
+Cloud Platform anvendes af udviklings- og platformteams, der arbejder i AWS.
 
-**Primær adgang:** AMP’s kapabiliteter konsumeres primært gennem IDP.  
-**Undtagelser:** Specialiserede platforme kan have andre mønstre – stadig under AMP-governance.
+**Primær adgang:** Cloud Platform’s kapabiliteter konsumeres primært gennem IDP.  
+**Undtagelser:** Specialiserede platforme kan have andre mønstre – stadig under Cloud Platform-governance.
 
 ---
 
-## Hvad AMP leverer (capabilities)
-AMP leverer fælles, standardiserede cloud-kapabiliteter, herunder:
+## Hvad Cloud Platform leverer (capabilities)
+Cloud Platform leverer fælles, standardiserede cloud-kapabiliteter, herunder:
 
 - Kontostruktur og styring (AWS org, accounts, guardrails)
 - Netværksfundament og patterns (i samarbejde med netværk)
@@ -43,20 +43,20 @@ Målet er at gøre teams selvkørende gennem standarder, automatisering, dokumen
 
 ---
 
-## Hvad AMP ikke er (afgrænsning)
-AMP:
+## Hvad Cloud Platform ikke er (afgrænsning)
+Cloud Platform:
 - udvikler ikke applikationsspecifik infrastruktur,
 - optimerer ikke individuelle produktarkitekturer,
 - overtager ikke ejerskab for workloads hos produktteams.
 
-**AMP leverer fundamentet – produktteams bygger ovenpå.**
+**Cloud Platform leverer fundamentet – produktteams bygger ovenpå.**
 
 ---
 
 ## Ansvar og snitflader (kort version)
-**Princip:** AMP ejer control plane (fundament og governance). Produktteams ejer workloads og drift af deres services.
+**Princip:** Cloud Platform ejer control plane (fundament og governance). Produktteams ejer workloads og drift af deres services.
 
-- AMP/Cloud Platform Team: accounts, guardrails, baseline security, central logging/audit, foundation patterns
+- Cloud Team: accounts, guardrails, baseline security, central logging/audit, foundation patterns
 - IDP: developer experience, self-service workflows, templates/golden paths
 - Produktteams: workloads, applikationsdrift, SLO’er, incidents på egne services
 
@@ -65,10 +65,10 @@ AMP:
 ---
 
 ## Drift og support (hvad kan man forvente?)
-AMP’s driftsansvar gælder det AMP ejer (control plane), ikke alle workloads i AWS.
+Cloud Platform’s driftsansvar gælder det Cloud Platform ejer (control plane), ikke alle workloads i AWS.
 
-- **Control plane incidents** (accounts/guardrails/baseline): håndteres af AMP-teamet
-- **Workload incidents** (applikationer/data): håndteres af produktteams (AMP kan understøtte/eskalere)
+- **Control plane incidents** (accounts/guardrails/baseline): håndteres af Cloud Team
+- **Workload incidents** (applikationer/data): håndteres af produktteams (Cloud Platform kan understøtte/eskalere)
 
 **Supportvindue (vælges og kommunikeres tydeligt):**
 - Option 1: Kontortid + eskalationsvagt ved kritiske control plane-fejl
@@ -90,7 +90,7 @@ Platformen gør det nemt at gøre det rigtige – især når det er komplekst.
 ---
 
 ## Beslutningsmandat og governance
-AMP-teamet har ejerskab og beslutningskompetence for platformen og fastlægger i samarbejde med interessenter:
+Cloud Team har ejerskab og beslutningskompetence for platformen og fastlægger i samarbejde med interessenter:
 
 - Arkitekturprincipper
 - Sikkerhedsmodeller
@@ -103,8 +103,8 @@ Beslutninger, standarder og kode deles som udgangspunkt åbent for transparens o
 
 ---
 
-## Succes (hvordan ved vi AMP virker?)
-AMP er en succes når vi ser:
+## Succes (hvordan ved vi Cloud Platform virker?)
+Cloud Platform er en succes når vi ser:
 
 - Ensartet governance og standarder i brug
 - Reduceret kompleksitet (fx færre AWS konti / bedre struktur)
@@ -116,9 +116,9 @@ AMP er en succes når vi ser:
 ---
 
 ## Komplementære platforme
-AMP, IDP og HCI er komplementære platforme med klart afgrænsede ansvarsområder:
+Cloud Platform, IDP og HCI er komplementære platforme med klart afgrænsede ansvarsområder:
 
-- AMP: cloud-fundamentet og governance
+- Cloud Platform: cloud-fundamentet og governance
 - IDP: applikationsplatform og developer experience
 - HCI: digitale arbejdspladser og identitet
 
