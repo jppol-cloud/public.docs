@@ -30,7 +30,8 @@ jobs:
       # ================================================================
       - name: Generate AWS Accounts page
         run: |
-          TMPDIR=$(mktemp -d)
+          mkdir -p /tmp/ref-docs
+          TMPDIR=/tmp/ref-docs
           TARGET="content/reference/aws-accounts.md"
 
           # Fetch all active accounts
@@ -146,14 +147,15 @@ jobs:
             echo "<!-- END CHANGELOG -->"
           } >> "$TARGET"
 
-          rm -rf "$TMPDIR"
+          # Keep accounts.json for TGW cross-referencing, clean up the rest
+          rm -f "$TMPDIR/ou_map.json" "$TMPDIR/rows.txt" "$TMPDIR/new_content.txt"
           echo "✅ Accounts page generated"
 
       # ================================================================
       # STEP 2: Generate Public Endpoints page
       # Source: AWS Config Aggregator (via scoped config-reader role in audit account)
       # ================================================================
-      - name: Generate Public Endpoints page
+      - name: Query Config Aggregator and generate Public Endpoints page
         run: |
           # Assume scoped config-reader role in audit account
           CREDS=$(aws sts assume-role \
@@ -169,6 +171,7 @@ jobs:
             --query 'ConfigurationAggregators[0].ConfigurationAggregatorName' \
             --output text)
           echo "Using Config Aggregator: $AGGREGATOR_NAME"
+          echo "$AGGREGATOR_NAME" > /tmp/ref-docs/aggregator_name.txt
 
           # --- Paginated Config query helper ---
           query_config() {
@@ -200,7 +203,7 @@ jobs:
             echo "$all_results"
           }
 
-          TMPDIR=$(mktemp -d)
+          TMPDIR=/tmp/ref-docs
           TARGET="content/reference/public-endpoints.md"
 
           # --- Query each resource type ---
@@ -229,6 +232,23 @@ jobs:
             > "$TMPDIR/instances_raw.json"
           jq '[.[] | select(.configuration.publicIpAddress != null and .configuration.publicIpAddress != "")]' \
             "$TMPDIR/instances_raw.json" > "$TMPDIR/instances.json"
+
+          # --- Phase 2 data: routing-chain resources ---
+          echo "Querying Internet Gateways..."
+          query_config "SELECT resourceId, accountId, configuration WHERE resourceType = 'AWS::EC2::InternetGateway'" \
+            > "$TMPDIR/igws.json"
+
+          echo "Querying Route Tables..."
+          query_config "SELECT resourceId, accountId, configuration WHERE resourceType = 'AWS::EC2::RouteTable'" \
+            > "$TMPDIR/route_tables.json"
+
+          echo "Querying Subnets..."
+          query_config "SELECT resourceId, accountId, configuration WHERE resourceType = 'AWS::EC2::Subnet'" \
+            > "$TMPDIR/subnets.json"
+
+          echo "Querying Security Groups..."
+          query_config "SELECT resourceId, accountId, configuration WHERE resourceType = 'AWS::EC2::SecurityGroup'" \
+            > "$TMPDIR/security_groups.json"
 
           # --- Generate markdown content ---
           {
@@ -413,15 +433,19 @@ jobs:
           Auto-generated from AWS Config Aggregator. Updated nightly.
           {: .fs-5 .fw-300 }
 
-          {: .warning }
-          > **Phase 1**: This page lists resources with public-facing attributes (e.g. internet-facing ALBs, CloudFront distributions).
-          > **Phase 2** will add routing-chain analysis (IGW → Route Table → Subnet → Security Group) to confirm actual internet reachability.
-
           ---
 
           FRONTMATTER
 
           {
+            echo "<!-- BEGIN PHASE2 -->"
+            echo "*Phase 2 analysis pending...*"
+            echo "<!-- END PHASE2 -->"
+            echo ""
+            echo "---"
+            echo ""
+            echo "## Resource Inventory (Phase 1)"
+            echo ""
             echo "<!-- BEGIN GENERATED CONTENT -->"
             cat "$TMPDIR/new_content.txt"
             echo "<!-- END GENERATED CONTENT -->"
@@ -435,8 +459,171 @@ jobs:
             echo "<!-- END CHANGELOG -->"
           } >> "$TARGET"
 
-          rm -rf "$TMPDIR"
           echo "✅ Endpoints page generated"
+
+      # ================================================================
+      # STEP 2b: Phase 2 — Routing-chain analysis
+      # Source: JSON data collected in Step 2
+      # ================================================================
+      - name: Analyze routing chain (Phase 2)
+        run: |
+          python3 scripts/analyze-routing-chain.py --data-dir /tmp/ref-docs \
+            > /tmp/ref-docs/phase2_output.md
+
+          TARGET="content/reference/public-endpoints.md"
+          if [ -s /tmp/ref-docs/phase2_output.md ]; then
+            # Inject Phase 2 output between markers
+            if grep -q '<!-- BEGIN PHASE2 -->' "$TARGET"; then
+              # Replace existing Phase 2 content
+              sed -i '/<!-- BEGIN PHASE2 -->/,/<!-- END PHASE2 -->/{//!d}' "$TARGET"
+              sed -i '/<!-- BEGIN PHASE2 -->/r /tmp/ref-docs/phase2_output.md' "$TARGET"
+            fi
+          fi
+          echo "✅ Phase 2 analysis complete"
+
+      # ================================================================
+      # STEP 2c: Generate TGW Route Tables page
+      # Source: EC2 API in network account (via scoped network-reader role)
+      # ================================================================
+      - name: Generate TGW Route Tables page
+        env:
+          NETWORK_ACCOUNT: "048261450640"
+        run: |
+          # Assume scoped network-reader role
+          CREDS=$(aws sts assume-role \
+            --role-arn "arn:aws:iam::${NETWORK_ACCOUNT}:role/github-actions-docs-network-reader" \
+            --role-session-name "ref-docs-tgw" \
+            --output json)
+          export AWS_ACCESS_KEY_ID=$(echo "$CREDS" | jq -r '.Credentials.AccessKeyId')
+          export AWS_SECRET_ACCESS_KEY=$(echo "$CREDS" | jq -r '.Credentials.SecretAccessKey')
+          export AWS_SESSION_TOKEN=$(echo "$CREDS" | jq -r '.Credentials.SessionToken')
+
+          TMPDIR=/tmp/ref-docs
+          TARGET="content/reference/tgw-routes.md"
+
+          # Get all TGWs
+          aws ec2 describe-transit-gateways --output json > "$TMPDIR/tgws.json"
+          TGW_ID=$(jq -r '.TransitGateways[0].TransitGatewayId' "$TMPDIR/tgws.json")
+          echo "TGW: $TGW_ID"
+
+          # Get all attachments
+          aws ec2 describe-transit-gateway-attachments \
+            --filters "Name=transit-gateway-id,Values=$TGW_ID" \
+            --output json > "$TMPDIR/tgw_attachments.json"
+
+          # Get all route tables
+          aws ec2 describe-transit-gateway-route-tables \
+            --filters "Name=transit-gateway-id,Values=$TGW_ID" \
+            --output json > "$TMPDIR/tgw_route_tables.json"
+
+          # Build account ID → name map from Step 1 data
+          ACCT_MAP=$(jq -r 'reduce .[] as $a ({}; . + {($a.Id): $a.Name})' "$TMPDIR/accounts.json")
+
+          # Build attachment ID → name/info map
+          ATT_MAP=$(jq -r '
+            reduce .TransitGatewayAttachments[] as $a ({};
+              . + {($a.TransitGatewayAttachmentId): {
+                "name": ($a.Tags // [] | map(select(.Key=="Name")) | .[0].Value // $a.TransitGatewayAttachmentId),
+                "type": $a.ResourceType,
+                "account": $a.ResourceOwnerId,
+                "state": $a.State,
+                "subnet_tag": ($a.Tags // [] | map(select(.Key=="subnet")) | .[0].Value // "-")
+              }}
+            )' "$TMPDIR/tgw_attachments.json")
+
+          # Generate content
+          {
+            ATT_COUNT=$(jq '.TransitGatewayAttachments | length' "$TMPDIR/tgw_attachments.json")
+            RTB_COUNT=$(jq '.TransitGatewayRouteTables | length' "$TMPDIR/tgw_route_tables.json")
+            echo "**Transit Gateway** \`${TGW_ID}\` — ${ATT_COUNT} attachments, ${RTB_COUNT} route tables"
+            echo ""
+
+            # Attachment summary
+            echo "### Attachments"
+            echo ""
+            echo "| Name | Type | Account | Account Name | Subnet CIDR | State |"
+            echo "|:-----|:-----|:--------|:-------------|:------------|:------|"
+            jq -r --argjson acct_map "$ACCT_MAP" '
+              .TransitGatewayAttachments | sort_by(.Tags // [] | map(select(.Key=="Name")) | .[0].Value // "") | .[] |
+              "| " +
+              ((.Tags // [] | map(select(.Key=="Name")) | .[0].Value) // .TransitGatewayAttachmentId) +
+              " | " + .ResourceType +
+              " | `" + .ResourceOwnerId + "`" +
+              " | " + ($acct_map[.ResourceOwnerId] // "-") +
+              " | " + ((.Tags // [] | map(select(.Key=="subnet")) | .[0].Value) // "-") +
+              " | " + .State + " |"' "$TMPDIR/tgw_attachments.json"
+            echo ""
+
+            # Per route table: routes
+            echo "### Route Tables"
+            echo ""
+            jq -r '.TransitGatewayRouteTables[] | .TransitGatewayRouteTableId' "$TMPDIR/tgw_route_tables.json" | while read -r RTB_ID; do
+              RTB_NAME=$(jq -r --arg id "$RTB_ID" '
+                .TransitGatewayRouteTables[] | select(.TransitGatewayRouteTableId==$id) |
+                (.Tags // [] | map(select(.Key=="Name")) | .[0].Value) // $id' "$TMPDIR/tgw_route_tables.json")
+
+              echo "#### ${RTB_NAME} (\`${RTB_ID}\`)"
+              echo ""
+
+              # Search routes (active + blackhole)
+              ROUTES=$(aws ec2 search-transit-gateway-routes \
+                --transit-gateway-route-table-id "$RTB_ID" \
+                --filters "Name=state,Values=active,blackhole" \
+                --output json 2>/dev/null || echo '{"Routes":[]}')
+
+              ROUTE_COUNT=$(echo "$ROUTES" | jq '.Routes | length')
+              if [ "$ROUTE_COUNT" -gt 0 ]; then
+                echo "| Destination | Attachment | Type | Account Name | Subnet CIDR | State |"
+                echo "|:------------|:-----------|:-----|:-------------|:------------|:------|"
+                echo "$ROUTES" | jq -r --argjson att_map "$ATT_MAP" --argjson acct_map "$ACCT_MAP" '
+                  .Routes | sort_by(.DestinationCidrBlock) | .[] |
+                  (.TransitGatewayAttachments // [{}])[0] as $att |
+                  ($att_map[$att.TransitGatewayAttachmentId] // {}) as $att_info |
+                  "| " + .DestinationCidrBlock +
+                  " | " + ($att_info.name // ($att.TransitGatewayAttachmentId // "-")) +
+                  " | " + (.Type // "-") +
+                  " | " + ($acct_map[$att_info.account // ""] // "-") +
+                  " | " + ($att_info.subnet_tag // "-") +
+                  " | " + .State + " |"'
+              else
+                echo "*No routes.*"
+              fi
+              echo ""
+            done
+          } > "$TMPDIR/tgw_content.txt"
+
+          # --- Write complete file ---
+          cat > "$TARGET" <<'FRONTMATTER'
+          ---
+          title: TGW Route Tables
+          parent: Reference
+          nav_order: 3
+          domain: private
+          ---
+
+          # Transit Gateway Route Tables
+          {: .no_toc }
+
+          Auto-generated from EC2 API in the network account. Updated nightly.
+          {: .fs-5 .fw-300 }
+
+          ---
+
+          FRONTMATTER
+
+          {
+            echo "<!-- BEGIN GENERATED CONTENT -->"
+            cat "$TMPDIR/tgw_content.txt"
+            echo "<!-- END GENERATED CONTENT -->"
+            echo ""
+            echo "---"
+            echo ""
+            echo "## Changelog"
+            echo "<!-- BEGIN CHANGELOG -->"
+            echo "<!-- END CHANGELOG -->"
+          } >> "$TARGET"
+
+          echo "✅ TGW route tables page generated"
 
       # ================================================================
       # STEP 3: Commit and push

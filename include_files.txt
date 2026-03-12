@@ -11,6 +11,7 @@
 ./content/manifest.existing
 ./content/slack
 ./_config.public.yml
+./scripts/analyze-routing-chain.py
 ./CNAME
 ./index.public.md
 ./README.public.md
