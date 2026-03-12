@@ -448,10 +448,10 @@ jobs:
 
           if [[ -n "$(git status --porcelain content/reference/)" ]]; then
             git add content/reference/
-            git pull --rebase origin main
             git commit -m "docs: update reference documentation $(date -u +%Y-%m-%d)
 
           Co-Authored-By: Oz <oz-agent@warp.dev>"
+            git pull --rebase origin main
             git push
             echo "✅ Changes committed and pushed"
           else
