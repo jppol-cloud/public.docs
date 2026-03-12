@@ -3,12 +3,16 @@
 // truncation (especially the DNS Name column on the public-endpoints page).
 // ---------------------------------------------------------------------------
 
-// Wrap all markdown tables in a scrollable container
+// Use wider content area for the main content
 .main-content {
-  table {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-    max-width: 100%;
-  }
+  max-width: 1200px;
+}
+
+// Make tables scrollable and prevent column truncation
+.main-content table {
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+  width: max-content;
+  min-width: 100%;
 }
