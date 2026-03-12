@@ -4,6 +4,7 @@
 ./include_files.txt
 ./.github/workflows/pages.yml
 ./.github/workflows/actionlint.yml
+./.github/workflows/reference-docs.yml
 ./_config.yml
 ./.gitignore
 ./content/manifest.gpt
