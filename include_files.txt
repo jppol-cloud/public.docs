@@ -13,6 +13,7 @@
 ./_config.public.yml
 ./scripts/analyze-routing-chain.py
 ./CNAME
+./_sass/custom/custom.scss
 ./index.public.md
 ./README.public.md
 ./README.md

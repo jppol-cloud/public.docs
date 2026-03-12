@@ -1,0 +1,14 @@
+// ---------------------------------------------------------------------------
+// Reference page tables: make wide tables scrollable and prevent column
+// truncation (especially the DNS Name column on the public-endpoints page).
+// ---------------------------------------------------------------------------
+
+// Wrap all markdown tables in a scrollable container
+.main-content {
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+}
