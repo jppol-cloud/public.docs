@@ -139,15 +139,19 @@ jobs:
 
           {
             echo "<!-- BEGIN GENERATED CONTENT -->"
+            echo ""
             cat "$TMPDIR/new_content.txt"
+            echo ""
             echo "<!-- END GENERATED CONTENT -->"
             echo ""
             echo "---"
             echo ""
             echo "## Changelog"
             echo "<!-- BEGIN CHANGELOG -->"
+            echo ""
             [ -n "$CHANGELOG_ENTRY" ] && printf '%s\n' "$CHANGELOG_ENTRY"
             [ -n "$EXISTING_CHANGELOG" ] && printf '%s\n' "$EXISTING_CHANGELOG"
+            echo ""
             echo "<!-- END CHANGELOG -->"
           } >> "$TARGET"
 
@@ -444,7 +448,9 @@ jobs:
 
           {
             echo "<!-- BEGIN PHASE2 -->"
+            echo ""
             echo "*Phase 2 analysis pending...*"
+            echo ""
             echo "<!-- END PHASE2 -->"
             echo ""
             echo "---"
@@ -452,15 +458,19 @@ jobs:
             echo "## Resource Inventory (Phase 1)"
             echo ""
             echo "<!-- BEGIN GENERATED CONTENT -->"
+            echo ""
             cat "$TMPDIR/new_content.txt"
+            echo ""
             echo "<!-- END GENERATED CONTENT -->"
             echo ""
             echo "---"
             echo ""
             echo "## Changelog"
             echo "<!-- BEGIN CHANGELOG -->"
+            echo ""
             [ -n "$CHANGELOG_ENTRY" ] && printf '%s\n' "$CHANGELOG_ENTRY"
             [ -n "$EXISTING_CHANGELOG" ] && printf '%s\n' "$EXISTING_CHANGELOG"
+            echo ""
             echo "<!-- END CHANGELOG -->"
           } >> "$TARGET"
 
@@ -619,13 +629,16 @@ jobs:
 
           {
             echo "<!-- BEGIN GENERATED CONTENT -->"
+            echo ""
             cat "$TMPDIR/tgw_content.txt"
+            echo ""
             echo "<!-- END GENERATED CONTENT -->"
             echo ""
             echo "---"
             echo ""
             echo "## Changelog"
             echo "<!-- BEGIN CHANGELOG -->"
+            echo ""
             echo "<!-- END CHANGELOG -->"
           } >> "$TARGET"
 
