@@ -48,9 +48,13 @@ jobs:
             > "$TMPDIR/ou_map.json"
 
           # Generate table rows
-          > "$TMPDIR/rows.txt"
+          : > "$TMPDIR/rows.txt"
+          TOTAL_ACCTS=$(jq length "$TMPDIR/accounts.json")
+          COUNT=0
           while read -r ACCT_ID; do
+            COUNT=$((COUNT + 1))
             ACCT_NAME=$(jq -r --arg id "$ACCT_ID" '.[] | select(.Id==$id) | .Name' "$TMPDIR/accounts.json")
+            echo "  [$COUNT/$TOTAL_ACCTS] $ACCT_NAME ($ACCT_ID)"
 
             # Get resource tags
             TAGS=$(aws organizations list-tags-for-resource --resource-id "$ACCT_ID" --output json 2>/dev/null \
@@ -162,9 +166,10 @@ jobs:
             --role-arn "arn:aws:iam::${AUDIT_ACCOUNT}:role/github-actions-docs-config-reader" \
             --role-session-name "ref-docs-endpoints" \
             --output json)
-          export AWS_ACCESS_KEY_ID=$(echo "$CREDS" | jq -r '.Credentials.AccessKeyId')
-          export AWS_SECRET_ACCESS_KEY=$(echo "$CREDS" | jq -r '.Credentials.SecretAccessKey')
-          export AWS_SESSION_TOKEN=$(echo "$CREDS" | jq -r '.Credentials.SessionToken')
+          AWS_ACCESS_KEY_ID=$(echo "$CREDS" | jq -r '.Credentials.AccessKeyId')
+          AWS_SECRET_ACCESS_KEY=$(echo "$CREDS" | jq -r '.Credentials.SecretAccessKey')
+          AWS_SESSION_TOKEN=$(echo "$CREDS" | jq -r '.Credentials.SessionToken')
+          export AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
 
           # Discover Config Aggregator name
           AGGREGATOR_NAME=$(aws configservice describe-configuration-aggregators \
@@ -361,7 +366,7 @@ jobs:
           } | sort > "$TMPDIR/new_resources.txt"
 
           EXISTING_CHANGELOG=""
-          > "$TMPDIR/old_resources.txt"
+          : > "$TMPDIR/old_resources.txt"
           if [ -f "$TARGET" ]; then
             EXISTING_CHANGELOG=$(sed -n '/<!-- BEGIN CHANGELOG -->/,/<!-- END CHANGELOG -->/p' "$TARGET" \
               | sed '1d;$d' || true)
@@ -494,9 +499,10 @@ jobs:
             --role-arn "arn:aws:iam::${NETWORK_ACCOUNT}:role/github-actions-docs-network-reader" \
             --role-session-name "ref-docs-tgw" \
             --output json)
-          export AWS_ACCESS_KEY_ID=$(echo "$CREDS" | jq -r '.Credentials.AccessKeyId')
-          export AWS_SECRET_ACCESS_KEY=$(echo "$CREDS" | jq -r '.Credentials.SecretAccessKey')
-          export AWS_SESSION_TOKEN=$(echo "$CREDS" | jq -r '.Credentials.SessionToken')
+          AWS_ACCESS_KEY_ID=$(echo "$CREDS" | jq -r '.Credentials.AccessKeyId')
+          AWS_SECRET_ACCESS_KEY=$(echo "$CREDS" | jq -r '.Credentials.SecretAccessKey')
+          AWS_SESSION_TOKEN=$(echo "$CREDS" | jq -r '.Credentials.SessionToken')
+          export AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_SESSION_TOKEN
 
           TMPDIR=/tmp/ref-docs
           TARGET="content/reference/tgw-routes.md"

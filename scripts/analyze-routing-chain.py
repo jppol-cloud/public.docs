@@ -33,13 +33,26 @@ def load_json(data_dir: Path, filename: str) -> list:
         return []
 
 
+def parse_config(resource: dict) -> dict:
+    """Extract configuration field, parsing it from JSON string if needed.
+    Config Aggregator sometimes returns 'configuration' as a JSON string.
+    """
+    config = resource.get("configuration", {})
+    if isinstance(config, str):
+        try:
+            config = json.loads(config)
+        except (json.JSONDecodeError, ValueError):
+            return {}
+    return config if isinstance(config, dict) else {}
+
+
 def build_igw_vpc_map(igws: list) -> dict:
     """Build {account: {vpc_id: igw_id}} from InternetGateway data."""
     igw_map = defaultdict(dict)
     for igw in igws:
         account = igw.get("accountId", "")
         igw_id = igw.get("resourceId", "")
-        config = igw.get("configuration", {})
+        config = parse_config(igw)
         attachments = config.get("attachments", [])
         for att in attachments:
             vpc_id = att.get("vpcId", "")
@@ -56,7 +69,7 @@ def find_public_route_tables(route_tables: list, igw_map: dict) -> dict:
     for rtb in route_tables:
         account = rtb.get("accountId", "")
         rtb_id = rtb.get("resourceId", "")
-        config = rtb.get("configuration", {})
+        config = parse_config(rtb)
 
         # Check routes for 0.0.0.0/0 → igw-*
         routes = config.get("routes", [])
@@ -106,7 +119,7 @@ def identify_public_subnets(subnets: list, public_rtbs: dict) -> dict:
     for subnet in subnets:
         account = subnet.get("accountId", "")
         subnet_id = subnet.get("resourceId", "")
-        config = subnet.get("configuration", {})
+        config = parse_config(subnet)
         cidr = config.get("cidrBlock", "")
 
         if account in public_subnet_set and subnet_id in public_subnet_set[account]:
@@ -126,7 +139,7 @@ def find_open_security_groups(security_groups: list) -> dict:
     for sg in security_groups:
         account = sg.get("accountId", "")
         sg_id = sg.get("resourceId", "")
-        config = sg.get("configuration", {})
+        config = parse_config(sg)
         ip_permissions = config.get("ipPermissions", [])
 
         open_ports = []
@@ -135,9 +148,12 @@ def find_open_security_groups(security_groups: list) -> dict:
             to_port = perm.get("toPort", -1)
             is_open = False
 
-            # Check IPv4 ranges
+            # Check IPv4 ranges — Config Aggregator may return strings or dicts
             for ip_range in perm.get("ipRanges", []):
-                cidr = ip_range.get("cidrIp", "")
+                if isinstance(ip_range, str):
+                    cidr = ip_range
+                else:
+                    cidr = ip_range.get("cidrIp", "")
                 if cidr == "0.0.0.0/0":
                     is_open = True
                     break
@@ -145,7 +161,10 @@ def find_open_security_groups(security_groups: list) -> dict:
             # Check IPv6 ranges
             if not is_open:
                 for ip_range in perm.get("ipv6Ranges", []):
-                    cidr = ip_range.get("cidrIpv6", "")
+                    if isinstance(ip_range, str):
+                        cidr = ip_range
+                    else:
+                        cidr = ip_range.get("cidrIpv6", "")
                     if cidr == "::/0":
                         is_open = True
                         break
@@ -175,7 +194,7 @@ def analyze_resources(data_dir: Path, public_subnets: dict, open_sgs: dict) -> l
     for inst in instances:
         account = inst.get("accountId", "")
         instance_id = inst.get("resourceId", "")
-        config = inst.get("configuration", {})
+        config = parse_config(inst)
         subnet_id = config.get("subnetId", "")
         public_ip = config.get("publicIpAddress", "")
 
@@ -214,7 +233,7 @@ def analyze_resources(data_dir: Path, public_subnets: dict, open_sgs: dict) -> l
     for alb in albs:
         account = alb.get("accountId", "")
         name = alb.get("resourceName", alb.get("resourceId", ""))
-        config = alb.get("configuration", {})
+        config = parse_config(alb)
         dns_name = config.get("dNSName", "")
         alb_type = config.get("type", "")
 
@@ -255,7 +274,7 @@ def analyze_resources(data_dir: Path, public_subnets: dict, open_sgs: dict) -> l
     eips = load_json(data_dir, "eips.json")
     for eip in eips:
         account = eip.get("accountId", "")
-        config = eip.get("configuration", {})
+        config = parse_config(eip)
         public_ip = config.get("publicIp", "")
         instance_id = config.get("instanceId", "")
         eni_id = config.get("networkInterfaceId", "")
@@ -284,7 +303,7 @@ def analyze_edge_services(data_dir: Path) -> list:
             "account": dist.get("accountId", ""),
             "resource": dist.get("resourceId", ""),
             "type": "CloudFront",
-            "endpoint": dist.get("configuration", {}).get("domainName", "-"),
+            "endpoint": parse_config(dist).get("domainName", "-"),
         })
 
     # API Gateway REST
@@ -302,7 +321,7 @@ def analyze_edge_services(data_dir: Path) -> list:
             "account": api.get("accountId", ""),
             "resource": api.get("resourceName", api.get("resourceId", "")),
             "type": "API Gateway (HTTP)",
-            "endpoint": api.get("configuration", {}).get("apiEndpoint", "-"),
+            "endpoint": parse_config(api).get("apiEndpoint", "-"),
         })
 
     return edge
