@@ -21,26 +21,15 @@ jobs:
       - name: Configure AWS Credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@7474bc4690e29a8392af63c5b98e7449536d5c3a # v4.3.1
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_MASTER_ACCOUNT }}:role/github-actions-tofu-master
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_MASTER_ACCOUNT }}:role/github-actions-docs
           aws-region: eu-west-1
 
       # ================================================================
       # STEP 1: Generate AWS Accounts page
-      # Source: AWS Organizations API (via master-deployment role)
+      # Source: AWS Organizations API (direct — docs role has read permissions)
       # ================================================================
       - name: Generate AWS Accounts page
-        env:
-          MASTER_ACCOUNT: ${{ secrets.AWS_MASTER_ACCOUNT }}
         run: |
-          # Assume master-deployment role for Organizations API access
-          CREDS=$(aws sts assume-role \
-            --role-arn "arn:aws:iam::${MASTER_ACCOUNT}:role/github-actions-master-deployment" \
-            --role-session-name "ref-docs-accounts" \
-            --output json)
-          export AWS_ACCESS_KEY_ID=$(echo "$CREDS" | jq -r '.Credentials.AccessKeyId')
-          export AWS_SECRET_ACCESS_KEY=$(echo "$CREDS" | jq -r '.Credentials.SecretAccessKey')
-          export AWS_SESSION_TOKEN=$(echo "$CREDS" | jq -r '.Credentials.SessionToken')
-
           TMPDIR=$(mktemp -d)
           TARGET="content/reference/aws-accounts.md"
 
@@ -162,13 +151,13 @@ jobs:
 
       # ================================================================
       # STEP 2: Generate Public Endpoints page
-      # Source: AWS Config Aggregator (via AWSControlTowerExecution in audit account)
+      # Source: AWS Config Aggregator (via scoped config-reader role in audit account)
       # ================================================================
       - name: Generate Public Endpoints page
         run: |
-          # Assume AWSControlTowerExecution in audit account for Config access
+          # Assume scoped config-reader role in audit account
           CREDS=$(aws sts assume-role \
-            --role-arn "arn:aws:iam::${AUDIT_ACCOUNT}:role/AWSControlTowerExecution" \
+            --role-arn "arn:aws:iam::${AUDIT_ACCOUNT}:role/github-actions-docs-config-reader" \
             --role-session-name "ref-docs-endpoints" \
             --output json)
           export AWS_ACCESS_KEY_ID=$(echo "$CREDS" | jq -r '.Credentials.AccessKeyId')
