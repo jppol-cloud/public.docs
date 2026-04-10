@@ -7,7 +7,7 @@ url: https://docs.cloud.jppol.dk
 
 aux_links:
   # Links to the private repo where changes should be made
-  GitHub: https://github.com/jppol-cloud/private.docs
+  GitHub: https://github.com/jppol-cloud/internal.docs
 
 mermaid:
   version: "9.1.3"
