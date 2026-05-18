@@ -3,11 +3,6 @@
 // truncation (especially the DNS Name column on the public-endpoints page).
 // ---------------------------------------------------------------------------
 
-// Use wider content area for the main content
-.main-content {
-  max-width: 1200px;
-}
-
 // Make tables scrollable and prevent column truncation
 .main-content table {
   display: block;
